@@ -1,89 +1,86 @@
--- [[ ♛ SATAYA VIP - HOUSE BREAKER (BRAINROT) ♛ ]] --
+-- [[ ♛ SATAYA VIP - ANTI-BACK NO CLIP (BRAINROT) ♛ ]] --
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local root = char:WaitForChild("HumanoidRootPart")
+local hum = char:WaitForChild("Humanoid")
 local run = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
--- [ 1. إنشاء الواجهة - تظهر بلمس الشاشة بـ 3 أصابع ]
-if player.PlayerGui:FindFirstChild("HouseBreaker") then player.PlayerGui.HouseBreaker:Destroy() end
-local sg = Instance.new("ScreenGui", player.PlayerGui)
-sg.Name = "HouseBreaker"
-sg.ResetOnSpawn = false
+-- [ 1. نظام الدخول ]
+if player.PlayerGui:FindFirstChild("AntiBackAdmin") then player.PlayerGui.AntiBackAdmin:Destroy() end
+local sg = Instance.new("ScreenGui", player.PlayerGui); sg.Name = "AntiBackAdmin"
 
-local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 240, 0, 300); Main.Position = UDim2.new(0.5, -120, 0.4, -150)
-Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0); Main.BorderSizePixel = 2
-Main.BorderColor3 = Color3.fromRGB(0, 255, 255); Main.Visible = true; Main.Draggable = true; Main.Active = true
+local Login = Instance.new("Frame", sg)
+Login.Size = UDim2.new(0, 260, 0, 140); Login.Position = UDim2.new(0.5, -130, 0.4, -70)
+Login.BackgroundColor3 = Color3.fromRGB(20, 0, 0); Login.BorderColor3 = Color3.fromRGB(255, 255, 0); Login.BorderSizePixel = 2
 
--- إخفاء وإظهار بـ 3 أصابع (للجوال)
-UIS.TouchStarted:Connect(function(_, processed)
-    if not processed and #UIS:GetTouches() >= 3 then Main.Visible = not Main.Visible end
-end)
+local Inp = Instance.new("TextBox", Login)
+Inp.PlaceholderText = "باسورد SATAYA..."; Inp.Size = UDim2.new(0.8, 0, 0, 40); Inp.Position = UDim2.new(0.1, 0, 0.3, 0)
+Inp.BackgroundColor3 = Color3.fromRGB(0,0,0); Inp.TextColor3 = Color3.fromRGB(255,255,255)
 
-local Title = Instance.new("TextLabel", Main)
-Title.Text = "♛ SATAYA اختراق البيوت ♛"; Title.Size = UDim2.new(1, 0, 0, 45)
-Title.BackgroundColor3 = Color3.fromRGB(0, 50, 100); Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+local btn = Instance.new("TextButton", Login)
+btn.Text = "تفعيل الأدمن"; btn.Size = UDim2.new(0.8, 0, 0, 35); btn.Position = UDim2.new(0.1, 0, 0.7, 0)
+btn.BackgroundColor3 = Color3.fromRGB(0, 150, 0); btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-local function CreateBtn(name, pos, callback)
-    local state = false
-    local btn = Instance.new("TextButton", Main)
-    btn.Text = name .. ": OFF"; btn.Size = UDim2.new(0.9, 0, 0, 45); btn.Position = UDim2.new(0.05, 0, 0, pos)
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.MouseButton1Click:Connect(function()
-        state = not state
-        btn.Text = state and (name .. ": ON") or (name .. ": OFF")
-        btn.BackgroundColor3 = state and Color3.fromRGB(0, 150, 200) or Color3.fromRGB(40, 40, 40)
-        callback(state)
-    end)
+-- [ 2. لوحة الأدمن (بدون رجوع للخلف) ]
+local Main = Instance.new("Frame", sg); Main.Visible = false
+Main.Size = UDim2.new(0, 240, 0, 320); Main.Position = UDim2.new(0.5, -120, 0.4, -160)
+Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0); Main.BorderColor3 = Color3.fromRGB(255, 255, 0); Main.Draggable = true; Main.Active = true
+
+UIS.TouchStarted:Connect(function(_, p) if not p and #UIS:GetTouches() >= 3 then Main.Visible = not Main.Visible end end)
+
+local function AddCmd(name, pos, func)
+    local b = Instance.new("TextButton", Main)
+    b.Text = name; b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, pos)
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.MouseButton1Click:Connect(func)
 end
 
--- [ 2. ميزات الاختراق SATAYA ]
+-- [ الميزات المطورة لحل مشكلة الرجوع ]
 
--- أ. اختراق البيت والجدران (Noclip)
-CreateBtn("اختراق الجدران (House Bypass)", 60, function(on)
-    _G.HouseNoclip = on
+-- 1. اختراق الجدران (بدون رجوع للخلف)
+AddCmd("اختراق البيت (بدون رجوع)", 55, function()
+    _G.AntiBack = true
     run.Stepped:Connect(function()
-        if _G.HouseNoclip and player.Character then
-            for _, v in pairs(player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then v.CanCollide = false end
-            end
-            -- تعطيل تصادم جدران البيوت والـ VIP في الماب
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v:IsA("BasePart") and (v.Name:lower():find("house") or v.Name:lower():find("vip") or v.Name:lower():find("wall")) then
-                    v.CanCollide = false
+        if _G.AntiBack and char then
+            for _, v in pairs(char:GetDescendants()) do
+                if v:IsA("BasePart") then 
+                    v.CanCollide = false -- يزيل التصادم
                 end
             end
+            -- خدعة السيرفر: دفع الشخصية للأمام قليلاً لمنع التعليق داخل الجدار
+            root.Velocity = root.CFrame.LookVector * 1.5
         end
     end)
 end)
 
--- ب. تجميع السرقة والمال داخل البيت
-CreateBtn("تجميع سرقة البيت فوري", 115, function(on)
-    _G.AutoLoot = on
-    task.spawn(function()
-        while _G.AutoLoot do
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v:IsA("BasePart") and (v.Name:lower():find("steal") or v.Name:lower():find("money") or v.Name:lower():find("gold")) then
-                    root.CFrame = v.CFrame; task.wait(0.3)
-                end
-            end
-            task.wait(0.5)
+-- 2. سحب الأغراض (نقل ذكي)
+AddCmd("سحب كل السرقة (Smart)", 110, function()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and (v.Name:lower():find("money") or v.Name:lower():find("steal")) then
+            -- الانتقال فوق الغرض قليلاً لتجنب الرجوع
+            root.CFrame = v.CFrame * CFrame.new(0, 2, 0) 
+            task.wait(0.2)
         end
-    end)
+    end
 end)
 
--- ج. سرعة البرق (بدون طرد)
-CreateBtn("سرعة الاختراق VIP", 170, function(on)
-    player.Character.Humanoid.WalkSpeed = on and 110 or 16
+-- 3. طيران الأدمن (السلس)
+AddCmd("طيران سلس (Fly)", 165, function()
+    local bg = Instance.new("BodyGyro", root)
+    bg.P = 9e4; bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9); bg.CFrame = root.CFrame
+    local bv = Instance.new("BodyVelocity", root)
+    bv.Velocity = Vector3.new(0, 0, 0); bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    -- هذا النوع من الطيران لا يكتشفه السيرفر بسهولة
 end)
 
--- د. وضع الخلود (عدم الموت)
-CreateBtn("الخلود VIP", 225, function(on)
-    _G.God = on
-    local p = workspace:FindFirstChild("SatayaFloor") or Instance.new("Part", workspace)
-    p.Name = "SatayaFloor"; p.Size = Vector3.new(15, 1, 15); p.Anchored = true; p.Transparency = 1
-    run.Heartbeat:Connect(function()
-        if _G.God then p.CFrame = root.CFrame * CFrame.new(0, -3.2, 0) else p.CFrame = CFrame.new(0,-500,0) end
-    end)
+-- 4. منصة الخلود (تحميك من السقوط)
+AddCmd("منصة الخلود VIP", 220, function()
+    local p = Instance.new("Part", workspace); p.Size = Vector3.new(15, 1, 15); p.Anchored = true; p.Transparency = 1
+    run.Heartbeat:Connect(function() p.CFrame = root.CFrame * CFrame.new(0, -3.5, 0) end)
+end)
+
+-- تفعيل الدخول
+btn.MouseButton1Click:Connect(function()
+    if Inp.Text == pass then Login.Visible = false; Main.Visible = true else Inp.Text = "غلط يا بطل!"; task.wait(1); Inp.Text = "" end
 end)
