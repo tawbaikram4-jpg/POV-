@@ -1,112 +1,136 @@
--- [[ ♛ SATAYA VIP 4X - PRO TOGGLE SYSTEM ♛ ]] --
+-- [[ ♛ SATAYA VIP - FULL VISIBLE TAB MENU ♛ ]] --
 local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
 local pgui = player:WaitForChild("PlayerGui")
 
--- تنظيف النسخ القديمة
-if pgui:FindFirstChild("SatayaPro") then pgui.SatayaPro:Destroy() end
+-- حذف أي نسخة قديمة لضمان عدم التداخل
+if pgui:FindFirstChild("SatayaUltraV3") then pgui.SatayaUltraV3:Destroy() end
 
-local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaPro"; sg.ResetOnSpawn = false
+local sg = Instance.new("ScreenGui", pgui)
+sg.Name = "SatayaUltraV3"
+sg.ResetOnSpawn = false
 
--- [ 1. الزر العائم الصغير (لإعادة فتح القائمة) ]
-local OpenBtn = Instance.new("TextButton", sg)
-OpenBtn.Size = UDim2.new(0, 60, 0, 60); OpenBtn.Position = UDim2.new(0, 10, 0.4, 0)
-OpenBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0); OpenBtn.Text = "♛"; OpenBtn.TextScaled = true
-OpenBtn.TextColor3 = Color3.new(1,1,1); OpenBtn.Visible = false
-local corner = Instance.new("UICorner", OpenBtn); corner.CornerRadius = UDim.new(1, 0)
-
--- [ 2. القائمة الرئيسية ]
+-- [ 1. الهيكل الرئيسي ]
 local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 300, 0, 400); Main.Position = UDim2.new(0.5, -150, 0.2, 0)
-Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); Main.Active = true; Main.Draggable = true
+Main.Size = UDim2.new(0, 400, 0, 300)
+Main.Position = UDim2.new(0.5, -200, 0.4, -150)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Main.BorderSizePixel = 2
+Main.Active = true
+Main.Draggable = true
 
-local Title = Instance.new("TextLabel", Main)
-Title.Text = "♛ SATAYA 4X PRO ♛"; Title.Size = UDim2.new(1, -40, 0, 50)
-Title.BackgroundColor3 = Color3.fromRGB(120, 0, 0); Title.TextColor3 = Color3.new(1,1,1); Title.TextScaled = true
+-- [ 2. القائمة اليسرى (التبويبات) ]
+local Sidebar = Instance.new("Frame", Main)
+Sidebar.Size = UDim2.new(0, 100, 1, 0)
+Sidebar.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
 
-local Close = Instance.new("TextButton", Main)
-Close.Text = "X"; Close.Size = UDim2.new(0, 40, 0, 50); Close.Position = UDim2.new(1, -40, 0, 0)
-Close.BackgroundColor3 = Color3.new(0.8, 0, 0); Close.TextColor3 = Color3.new(1,1,1)
+-- [ 3. منطقة عرض الميزات ]
+local Content = Instance.new("Frame", Main)
+Content.Position = UDim2.new(0, 110, 0, 10)
+Content.Size = UDim2.new(1, -120, 1, -20)
+Content.BackgroundTransparency = 1
 
-local Scroll = Instance.new("ScrollingFrame", Main)
-Scroll.Size = UDim2.new(1, 0, 1, -50); Scroll.Position = UDim2.new(0, 0, 0, 50)
-Scroll.CanvasSize = UDim2.new(0, 0, 2, 0); Scroll.ScrollBarThickness = 5; Scroll.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+local list = Instance.new("UIListLayout", Content)
+list.Padding = UDim.new(0, 10)
 
--- برمجة الفتح والإغلاق
-Close.MouseButton1Click:Connect(function() Main.Visible = false; OpenBtn.Visible = true end)
-OpenBtn.MouseButton1Click:Connect(function() Main.Visible = true; OpenBtn.Visible = false end)
+-- دالة لتنظيف المحتوى
+local function Clear()
+    for _, v in pairs(Content:GetChildren()) do
+        if v:IsA("TextButton") then v:Destroy() end
+    end
+end
 
--- [ 3. دالة إنشاء أزرار ON/OFF ]
-local function CreateToggle(name, pos, func)
-    local btn = Instance.new("TextButton", Scroll)
-    btn.Size = UDim2.new(0.9, 0, 0, 45); btn.Position = UDim2.new(0.05, 0, 0, pos)
-    btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0) -- البداية أحمر (OFF)
-    btn.Text = name .. " [OFF]"; btn.TextColor3 = Color3.new(1,1,1); btn.TextScaled = true
-    local cornerBtn = Instance.new("UICorner", btn)
-
+-- دالة إضافة أزرار ON/OFF
+local function AddToggle(name, func_on, func_off)
+    local btn = Instance.new("TextButton", Content)
+    btn.Size = UDim2.new(1, 0, 0, 45)
+    btn.Text = name .. " [OFF]"
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.TextScaled = true
+    
     local active = false
     btn.MouseButton1Click:Connect(function()
         active = not active
-        if active then
-            btn.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- أخضر (ON)
-            btn.Text = name .. " [ON]"
-            -- تشغيل الوظيفة في حلقة تكرار
-            task.spawn(function()
-                while active do
-                    func()
-                    task.wait(0.5) -- سرعة التكرار
-                end
-            end)
-        else
-            btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0) -- أحمر (OFF)
-            btn.Text = name .. " [OFF]"
-        end
+        btn.Text = active and name .. " [ON]" or name .. " [OFF]"
+        btn.BackgroundColor3 = active and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(60, 60, 60)
+        if active then task.spawn(func_on) else func_off() end
     end)
 end
 
--- [ 4. إضافة المميزات ]
+-- [ 4. محتوى الأقسام ]
 
--- أ. مطر الخشب والوقود فوق النار
-CreateToggle("مطر الخشب والوقود 🔥", 10, function()
-    for _, v in pairs(game.Workspace:GetDescendants()) do
-        if (v.Name:lower():find("wood") or v.Name:lower():find("fuel") or v.Name:lower():find("log")) and v:IsA("BasePart") then
-            v.CFrame = game.Workspace.Fire.CFrame + Vector3.new(0, 15, 0)
+-- قسم النار والموارد
+local function OpenFire()
+    Clear()
+    AddToggle("مطر الخشب للنار 🔥", function()
+        _G.AutoFire = true
+        while _G.AutoFire do
+            local fire = game.Workspace:FindFirstChild("Fire", true) or game.Workspace:FindFirstChild("Campfire", true)
+            if fire then
+                for _, v in pairs(game.Workspace:GetChildren()) do
+                    if v:IsA("BasePart") and not v.Anchored then v.CFrame = fire.CFrame + Vector3.new(0,10,0) end
+                end
+            end
+            task.wait(1)
         end
-    end
-end)
-
--- ب. إنقاذ الأطفال فوراً
-CreateToggle("جلب الأطفال 👶", 65, function()
-    for _, v in pairs(game.Workspace:GetDescendants()) do
-        if v.Name:lower():find("kid") or v.Name:lower():find("child") then
-            v.CFrame = player.Character.HumanoidRootPart.CFrame
+    end, function() _G.AutoFire = false end)
+    
+    AddToggle("جلب وترتيب البيض 🥚", function()
+        _G.AutoEgg = true
+        while _G.AutoEgg do
+            local count = 0
+            for _, v in pairs(game.Workspace:GetDescendants()) do
+                if v.Name:lower():find("egg") and v:IsA("BasePart") then
+                    v.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new((count%4)*4, -2, -6)
+                    count = count + 1
+                end
+            end
+            task.wait(1.5)
         end
-    end
-end)
+    end, function() _G.AutoEgg = false end)
+end
 
--- ج. جلب الضمادات (التداوي)
-CreateToggle("جلب الضمادات 🩹", 120, function()
-    for _, v in pairs(game.Workspace:GetDescendants()) do
-        if v.Name:lower():find("bandage") or v.Name:lower():find("med") then
-            v.CFrame = player.Character.HumanoidRootPart.CFrame
+-- قسم كشف الأماكن (ESP)
+local function OpenESP()
+    Clear()
+    AddToggle("كشف الأنبوب (حيوانات) 🐾", function()
+        _G.EspOn = true
+        while _G.EspOn do
+            -- كود الكشف البسيط هنا
+            task.wait(2)
         end
-    end
+    end, function() _G.EspOn = false end)
+end
+
+-- [ 5. أزرار التبديل الجانبية ]
+local function SideBtn(text, pos, func)
+    local b = Instance.new("TextButton", Sidebar)
+    b.Size = UDim2.new(0.9, 0, 0, 40)
+    b.Position = UDim2.new(0.05, 0, 0, pos)
+    b.Text = text
+    b.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.MouseButton1Click:Connect(func)
+end
+
+SideBtn("النار 🔥", 10, OpenFire)
+SideBtn("الكشف 👀", 60, OpenESP)
+SideBtn("السرعة ⚡", 110, function() 
+    Clear()
+    AddToggle("سرعة الملك (150)", function() player.Character.Humanoid.WalkSpeed = 150 end, function() player.Character.Humanoid.WalkSpeed = 16 end)
 end)
 
--- د. قطع الأشجار تلقائياً
-CreateToggle("قطع الأشجار 🪓", 175, function()
-    local rem = game.ReplicatedStorage:FindFirstChild("AxeRemote") or game.ReplicatedStorage:FindFirstChild("CutRemote")
-    if rem then rem:FireServer("All") end
-end)
+-- زر الإغلاق والفتح (X و ♛)
+local Close = Instance.new("TextButton", Main)
+Close.Text = "X"; Close.Size = UDim2.new(0, 35, 0, 35); Close.Position = UDim2.new(1, -35, 0, 0)
+Close.BackgroundColor3 = Color3.new(1, 0, 0)
 
--- هـ. السرعة الملكية
-CreateToggle("سرعة الملك ⚡", 230, function()
-    player.Character.Humanoid.WalkSpeed = 150
-end)
+local Open = Instance.new("TextButton", sg)
+Open.Text = "♛"; Open.Size = UDim2.new(0, 50, 0, 50); Open.Position = UDim2.new(0, 10, 0.5, 0)
+Open.BackgroundColor3 = Color3.new(0.5, 0, 0); Open.Visible = false
 
--- و. الطيران
-CreateToggle("تفعيل الطيران ✈️", 285, function()
-    player.Character.HumanoidRootPart.Velocity = Vector3.new(0, 50, 0)
-end)
+Close.MouseButton1Click:Connect(function() Main.Visible = false; Open.Visible = true end)
+Open.MouseButton1Click:Connect(function() Main.Visible = true; Open.Visible = false end)
 
-print("♛ نسخة SATAYA PRO بنظام التشغيل والإيقاف جاهزة! ♛")
+-- فتح أول قسم تلقائياً
+OpenFire()
