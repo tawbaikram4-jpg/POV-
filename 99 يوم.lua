@@ -1,87 +1,85 @@
--- [[ ♛ SATAYA VIP - TOGGLE SYSTEM ♛ ]] --
+-- [[ ♛ SATAYA VIP - FIXED VERSION ♛ ]] --
 local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
+local pgui = player:WaitForChild("PlayerGui")
 
--- [ 1. إنشاء الواجهة الرئيسية ]
-if player.PlayerGui:FindFirstChild("SatayaSystem") then player.PlayerGui.SatayaSystem:Destroy() end
-local sg = Instance.new("ScreenGui", player.PlayerGui); sg.Name = "SatayaSystem"; sg.ResetOnSpawn = false
+-- حذف أي نسخة قديمة لضمان عدم التداخل
+if pgui:FindFirstChild("SatayaFixed") then pgui.SatayaFixed:Destroy() end
 
--- [ 2. الزر العائم (الذي يفتح القائمة) ]
+local sg = Instance.new("ScreenGui", pgui)
+sg.Name = "SatayaFixed"
+sg.ResetOnSpawn = false
+
+-- [ 1. الزر الصغير (الذي يفتح القائمة) ]
 local OpenBtn = Instance.new("TextButton", sg)
-OpenBtn.Name = "OpenButton"
-OpenBtn.Size = UDim2.new(0, 80, 0, 40)
-OpenBtn.Position = UDim2.new(0, 10, 0.5, -20) -- يظهر في يسار الشاشة
-OpenBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-OpenBtn.Text = "♛ SATAYA"
+OpenBtn.Size = UDim2.new(0, 100, 0, 40)
+OpenBtn.Position = UDim2.new(0, 10, 0.5, 0)
+OpenBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+OpenBtn.Text = "OPEN SATAYA"
 OpenBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-OpenBtn.TextScaled = true
-OpenBtn.BorderSizePixel = 2
-OpenBtn.Visible = false -- يكون مخفياً في البداية إذا القائمة مفتوحة
+OpenBtn.Visible = false -- مخفي لأن القائمة ستفتح أولاً
+OpenBtn.ZIndex = 10
 
--- جعل الزر العائم دائرياً قليلاً وشكلاً جذاباً
-local corner = Instance.new("UICorner", OpenBtn); corner.CornerRadius = ToolBuffer.new(0, 10)
-
--- [ 3. إطار القائمة الرئيسية ]
+-- [ 2. إطار القائمة الرئيسية ]
 local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 280, 0, 280); Main.Position = UDim2.new(0.5, -140, 0.3, 0)
-Main.BackgroundColor3 = Color3.fromRGB(20, 0, 0); Main.BorderSizePixel = 2; Main.Draggable = true
+Main.Size = UDim2.new(0, 250, 0, 250)
+Main.Position = UDim2.new(0.5, -125, 0.4, -125)
+Main.BackgroundColor3 = Color3.fromRGB(30, 0, 0)
+Main.BorderSizePixel = 3
 Main.Active = true
+Main.Draggable = true -- يمكنك تحريك القائمة بيدك
 
--- زر الإغلاق (X) داخل القائمة
+-- عنوان القائمة
+local Title = Instance.new("TextLabel", Main)
+Title.Text = "♛ SATAYA MENU ♛"
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+Title.TextColor3 = Color3.new(1,1,1)
+
+-- [ 3. زر الإغلاق داخل القائمة ]
 local CloseBtn = Instance.new("TextButton", Main)
-CloseBtn.Text = "X"; CloseBtn.Size = UDim2.new(0, 35, 0, 35); CloseBtn.Position = UDim2.new(1, -40, 0, 5)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0); CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextScaled = true
+CloseBtn.Text = "X"
+CloseBtn.Size = UDim2.new(0, 40, 0, 40)
+CloseBtn.Position = UDim2.new(1, -40, 0, 0)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1,1,1)
 
--- [ 4. برمجة الفتح والإغلاق ]
+-- برمجة الفتح والإغلاق
 CloseBtn.MouseButton1Click:Connect(function()
     Main.Visible = false
-    OpenBtn.Visible = true -- يظهر الزر الصغير عند إغلاق القائمة
+    OpenBtn.Visible = true
 end)
 
 OpenBtn.MouseButton1Click:Connect(function()
     Main.Visible = true
-    OpenBtn.Visible = false -- يختفي الزر الصغير عند فتح القائمة
+    OpenBtn.Visible = false
 end)
 
--- [ 5. أزرار الميزات (جلب الأغراض وتطوير النار) ]
-local function AddToggle(name, pos, callback)
+-- [ 4. أزرار الميزات (جلب الأغراض والسرعة) ]
+local function AddButton(name, pos, func)
     local btn = Instance.new("TextButton", Main)
-    btn.Text = name; btn.Size = UDim2.new(0.9, 0, 0, 45); btn.Position = UDim2.new(0.05, 0, 0, pos)
-    btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0); btn.TextColor3 = Color3.fromRGB(255, 255, 255); btn.TextScaled = true
-    
-    local enabled = false
-    btn.MouseButton1Click:Connect(function()
-        enabled = not enabled
-        btn.BackgroundColor3 = enabled and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(50, 0, 0)
-        callback(enabled)
-    end)
+    btn.Text = name
+    btn.Size = UDim2.new(0.9, 0, 0, 45)
+    btn.Position = UDim2.new(0.05, 0, 0, pos)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.MouseButton1Click:Connect(func)
 end
 
--- أضف ميزاتك هنا كما في السكربت السابق
-AddToggle("جلب البيض والأغراض 🔥", 50, function(state)
-    _G.AutoGrab = state
-    while _G.AutoGrab do
-        for _, item in pairs(game:GetService("Workspace"):GetDescendants()) do
-            if (item.Name:lower():find("egg") or item.Name:lower():find("item")) and item:IsA("BasePart") then
-                item.CFrame = char.HumanoidRootPart.CFrame
-            end
+AddButton("جلب البيض والأغراض 🔥", 60, function()
+    -- كود جلب الأغراض
+    for _, item in pairs(game.Workspace:GetDescendants()) do
+        if (item.Name:lower():find("egg") or item.Name:lower():find("item")) and item:IsA("BasePart") then
+            item.CFrame = player.Character.HumanoidRootPart.CFrame
         end
-        task.wait(0.5)
     end
 end)
 
-AddToggle("تطوير النار تلقائياً ⚡", 110, function(state)
-    _G.AutoFire = state
-    while _G.AutoFire do
-        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("UpgradeRemote")
-        if remote then remote:FireServer("Upgrade", "Fire") end
-        task.wait(2)
-    end
+AddButton("تطوير النار ⚡", 120, function()
+    -- كود التطوير
+    local rem = game.ReplicatedStorage:FindFirstChild("UpgradeRemote")
+    if rem then rem:FireServer("Upgrade", "Fire") end
 end)
 
-AddToggle("سرعة الملك SATAYA ♛", 170, function(state)
-    char.Humanoid.WalkSpeed = state and 120 or 16
+AddButton("سرعة الملك ♛", 180, function()
+    player.Character.Humanoid.WalkSpeed = 100
 end)
-
-print("♛ نظام SATAYA VIP الجديد جاهز للسيطرة! ♛")
