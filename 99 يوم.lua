@@ -1,136 +1,141 @@
--- [[ ♛ SATAYA VIP - FULL VISIBLE TAB MENU ♛ ]] --
+-- [[ ♛ SATAYA VIP - THE ULTIMATE ALL-IN-ONE ♛ ]] --
 local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+local camera = game.Workspace.CurrentCamera
 local pgui = player:WaitForChild("PlayerGui")
 
--- حذف أي نسخة قديمة لضمان عدم التداخل
-if pgui:FindFirstChild("SatayaUltraV3") then pgui.SatayaUltraV3:Destroy() end
+-- تنظيف النسخ السابقة
+if pgui:FindFirstChild("SatayaFinalMenu") then pgui.SatayaFinalMenu:Destroy() end
+local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaFinalMenu"; sg.ResetOnSpawn = false
 
-local sg = Instance.new("ScreenGui", pgui)
-sg.Name = "SatayaUltraV3"
-sg.ResetOnSpawn = false
-
--- [ 1. الهيكل الرئيسي ]
+-- [ 1. الهيكل الرئيسي المطور ]
 local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 400, 0, 300)
-Main.Position = UDim2.new(0.5, -200, 0.4, -150)
-Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Main.BorderSizePixel = 2
-Main.Active = true
-Main.Draggable = true
+Main.Size = UDim2.new(0, 500, 0, 350); Main.Position = UDim2.new(0.5, -250, 0.3, 0)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); Main.BorderSizePixel = 0; Main.Active = true; Main.Draggable = true
+Instance.new("UICorner", Main)
 
--- [ 2. القائمة اليسرى (التبويبات) ]
-local Sidebar = Instance.new("Frame", Main)
-Sidebar.Size = UDim2.new(0, 100, 1, 0)
-Sidebar.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+local Side = Instance.new("Frame", Main)
+Side.Size = UDim2.new(0, 130, 1, 0); Side.BackgroundColor3 = Color3.fromRGB(45, 0, 0)
+Instance.new("UICorner", Side)
 
--- [ 3. منطقة عرض الميزات ]
 local Content = Instance.new("Frame", Main)
-Content.Position = UDim2.new(0, 110, 0, 10)
-Content.Size = UDim2.new(1, -120, 1, -20)
-Content.BackgroundTransparency = 1
+Content.Position = UDim2.new(0, 140, 0, 10); Content.Size = UDim2.new(1, -150, 1, -20); Content.BackgroundTransparency = 1
+local layout = Instance.new("UIListLayout", Content); layout.Padding = UDim.new(0, 8)
 
-local list = Instance.new("UIListLayout", Content)
-list.Padding = UDim.new(0, 10)
+-- [ 2. الوظائف التقنية (ESP, Tracer, Aimbot) ]
+_G.TracerOn = false; _G.AimbotOn = false
 
--- دالة لتنظيف المحتوى
-local function Clear()
-    for _, v in pairs(Content:GetChildren()) do
-        if v:IsA("TextButton") then v:Destroy() end
+local function CreateVisuals(obj, name, color)
+    if not obj:FindFirstChild("SatayaVisual") then
+        local box = Instance.new("BoxHandleAdornment", obj); box.Name = "SatayaVisual"; box.Adornee = obj
+        box.AlwaysOnTop = true; box.ZIndex = 10; box.Size = obj.Size; box.Color3 = color; box.Transparency = 0.6
     end
 end
 
--- دالة إضافة أزرار ON/OFF
+-- [ 3. محرك الأقسام ]
+local function Clear() for _, v in pairs(Content:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end end
+
 local function AddToggle(name, func_on, func_off)
     local btn = Instance.new("TextButton", Content)
-    btn.Size = UDim2.new(1, 0, 0, 45)
-    btn.Text = name .. " [OFF]"
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.TextScaled = true
-    
+    btn.Size = UDim2.new(1, 0, 0, 45); btn.Text = name .. " [OFF]"; btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.new(1,1,1); btn.TextScaled = true; Instance.new("UICorner", btn)
     local active = false
     btn.MouseButton1Click:Connect(function()
         active = not active
         btn.Text = active and name .. " [ON]" or name .. " [OFF]"
-        btn.BackgroundColor3 = active and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(60, 60, 60)
-        if active then task.spawn(func_on) else func_off() end
+        btn.BackgroundColor3 = active and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(50, 50, 50)
+        if active then spawn(function() while active do pcall(func_on) task.wait(1) end end) else pcall(func_off) end
     end)
 end
 
 -- [ 4. محتوى الأقسام ]
 
 -- قسم النار والموارد
-local function OpenFire()
+local function TabFire()
     Clear()
     AddToggle("مطر الخشب للنار 🔥", function()
-        _G.AutoFire = true
-        while _G.AutoFire do
-            local fire = game.Workspace:FindFirstChild("Fire", true) or game.Workspace:FindFirstChild("Campfire", true)
-            if fire then
-                for _, v in pairs(game.Workspace:GetChildren()) do
-                    if v:IsA("BasePart") and not v.Anchored then v.CFrame = fire.CFrame + Vector3.new(0,10,0) end
-                end
+        local fire = game.Workspace:FindFirstChild("Fire", true) or game.Workspace:FindFirstChild("Campfire", true)
+        if fire then for _, v in pairs(game.Workspace:GetChildren()) do if v:IsA("BasePart") and not v.Anchored then v.CFrame = fire.CFrame + Vector3.new(0, 10, 0) end end end
+    end, function() end)
+end
+
+-- قسم البيض (حل مشكلة السقوط والبرق)
+local function TabEggs()
+    Clear()
+    AddToggle("البيض للسلة (آمن) 🥚", function()
+        local basket = game.Workspace:FindFirstChild("Basket", true) or char:FindFirstChild("Basket", true)
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if v.Name:lower():find("egg") and v:IsA("BasePart") then
+                v.CanCollide = false; v.Massless = true
+                if basket then v.CFrame = basket.CFrame + Vector3.new(0, 2, 0) else v.CFrame = root.CFrame * CFrame.new(0, 0, -5) end
             end
-            task.wait(1)
         end
-    end, function() _G.AutoFire = false end)
+    end, function() end)
     
-    AddToggle("جلب وترتيب البيض 🥚", function()
-        _G.AutoEgg = true
-        while _G.AutoEgg do
-            local count = 0
-            for _, v in pairs(game.Workspace:GetDescendants()) do
-                if v.Name:lower():find("egg") and v:IsA("BasePart") then
-                    v.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new((count%4)*4, -2, -6)
-                    count = count + 1
-                end
+    AddToggle("جلب بيضة البرق النادرة ⚡", function()
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if (v.Name:lower():find("light") or v.Name:lower():find("rare")) and v:IsA("BasePart") then
+                v.CFrame = root.CFrame * CFrame.new(0, 0, -5)
             end
-            task.wait(1.5)
         end
-    end, function() _G.AutoEgg = false end)
+    end, function() end)
 end
 
--- قسم كشف الأماكن (ESP)
-local function OpenESP()
+-- قسم الكشف والأيم بوت (الأنبوب + الرأس)
+local function TabCombat()
     Clear()
-    AddToggle("كشف الأنبوب (حيوانات) 🐾", function()
-        _G.EspOn = true
-        while _G.EspOn do
-            -- كود الكشف البسيط هنا
-            task.wait(2)
+    AddToggle("كشف الأنبوب + ESP 📍", function()
+        _G.TracerOn = true
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if (v.Name:lower():find("animal") or v.Name:lower():find("bear") or v.Name:lower():find("kid")) and v:IsA("BasePart") then
+                CreateVisuals(v, v.Name, Color3.new(1, 0, 0))
+            end
         end
-    end, function() _G.EspOn = false end)
+    end, function() _G.TracerOn = false end)
+
+    AddToggle("أيم بوت (قفل على الرأس) 🎯", function()
+        _G.AimbotOn = true
+        local target = nil
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if (v.Name:lower():find("animal") or v.Name:lower():find("bear")) and v:IsA("Model") then
+                local head = v:FindFirstChild("Head")
+                if head then camera.CFrame = CFrame.new(camera.CFrame.Position, head.Position) break end
+            end
+        end
+    end, function() _G.AimbotOn = false end)
 end
 
--- [ 5. أزرار التبديل الجانبية ]
-local function SideBtn(text, pos, func)
-    local b = Instance.new("TextButton", Sidebar)
-    b.Size = UDim2.new(0.9, 0, 0, 40)
-    b.Position = UDim2.new(0.05, 0, 0, pos)
-    b.Text = text
-    b.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.MouseButton1Click:Connect(func)
-end
-
-SideBtn("النار 🔥", 10, OpenFire)
-SideBtn("الكشف 👀", 60, OpenESP)
-SideBtn("السرعة ⚡", 110, function() 
+-- قسم السرعة والصبية
+local function TabExtra()
     Clear()
-    AddToggle("سرعة الملك (150)", function() player.Character.Humanoid.WalkSpeed = 150 end, function() player.Character.Humanoid.WalkSpeed = 16 end)
-end)
+    AddToggle("سرعة الملك الأسطورية ⚡", function() char.Humanoid.WalkSpeed = 150 end, function() char.Humanoid.WalkSpeed = 16 end)
+    AddToggle("جلب الصبية بالترتيب 👶", function()
+        local count = 0
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if (v.Name:lower():find("boy") or v.Name:lower():find("kid")) and v:IsA("Model") then
+                local r = v:FindFirstChild("HumanoidRootPart") or v:FindFirstChildWhichIsA("BasePart")
+                if r then r.CFrame = root.CFrame * CFrame.new((count%4)*5, 0, -10); count = count + 1 end
+            end
+        end
+    end, function() end)
+end
+
+-- [ 5. أزرار القائمة الجانبية ]
+local function SideBtn(txt, pos, func)
+    local b = Instance.new("TextButton", Side); b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, pos)
+    b.Text = txt; b.BackgroundColor3 = Color3.fromRGB(150, 0, 0); b.TextColor3 = Color3.new(1, 1, 1); b.MouseButton1Click:Connect(func); Instance.new("UICorner", b)
+end
+
+SideBtn("النار 🔥", 10, TabFire)
+SideBtn("البيض 🥚", 65, TabEggs)
+SideBtn("القتال 🎯", 120, TabCombat)
+SideBtn("إضافات ✨", 175, TabExtra)
 
 -- زر الإغلاق والفتح (X و ♛)
-local Close = Instance.new("TextButton", Main)
-Close.Text = "X"; Close.Size = UDim2.new(0, 35, 0, 35); Close.Position = UDim2.new(1, -35, 0, 0)
-Close.BackgroundColor3 = Color3.new(1, 0, 0)
-
-local Open = Instance.new("TextButton", sg)
-Open.Text = "♛"; Open.Size = UDim2.new(0, 50, 0, 50); Open.Position = UDim2.new(0, 10, 0.5, 0)
-Open.BackgroundColor3 = Color3.new(0.5, 0, 0); Open.Visible = false
-
+local Close = Instance.new("TextButton", Main); Close.Text = "X"; Close.Size = UDim2.new(0, 35, 0, 35); Close.Position = UDim2.new(1, -40, 0, 5); Close.BackgroundColor3 = Color3.new(1,0,0)
+local Open = Instance.new("TextButton", sg); Open.Text = "♛"; Open.Size = UDim2.new(0, 60, 0, 60); Open.Position = UDim2.new(0, 10, 0.5, 0); Open.Visible = false; Open.BackgroundColor3 = Color3.new(0.6, 0, 0); Instance.new("UICorner", Open).CornerRadius = UDim.new(1,0)
 Close.MouseButton1Click:Connect(function() Main.Visible = false; Open.Visible = true end)
 Open.MouseButton1Click:Connect(function() Main.Visible = true; Open.Visible = false end)
 
--- فتح أول قسم تلقائياً
-OpenFire()
+TabFire() -- البدء بقسم النار
