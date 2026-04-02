@@ -1,90 +1,87 @@
--- [[ ♛ SATAYA VIP - THE FINAL 100% WORKING HUB ♛ ]] --
+-- [[ ♛ SATAYA VIP - INFINITY FARM LOOP ♛ ]] --
 local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+local TS = game:GetService("TweenService")
 local pgui = player:WaitForChild("PlayerGui")
 
--- تنظيف الشاشة من أي محاولات سابقة
-if pgui:FindFirstChild("SatayaFinal100") then pgui.SatayaFinal100:Destroy() end
-local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaFinal100"; sg.ResetOnSpawn = false
+if pgui:FindFirstChild("SatayaHurricane") then pgui.SatayaHurricane:Destroy() end
+local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaHurricane"; sg.ResetOnSpawn = false
 
--- [ 1. البانل الملكي ]
 local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 340, 0, 320); Main.Position = UDim2.new(0.5, -170, 0.4, 0)
-Main.BackgroundColor3 = Color3.fromRGB(5, 5, 10); Main.Active = true; Main.Draggable = true
+Main.Size = UDim2.new(0, 350, 0, 320); Main.Position = UDim2.new(0.5, -175, 0.4, 0)
+Main.BackgroundColor3 = Color3.fromRGB(0, 20, 40); Main.Active = true; Main.Draggable = true
 Instance.new("UICorner", Main)
 
 local Display = Instance.new("TextLabel", Main)
-Display.Text = "نظام SATAYA جاهز للتعويض..."; Display.Size = UDim2.new(1, 0, 0, 100)
-Display.BackgroundColor3 = Color3.fromRGB(0, 20, 40); Display.TextColor3 = Color3.new(1, 1, 1); Display.TextScaled = true
+Display.Text = "نظام الإعصار جاهز للربح... 🌀"; Display.Size = UDim2.new(1, 0, 0, 110)
+Display.BackgroundColor3 = Color3.fromRGB(0, 40, 80); Display.TextColor3 = Color3.new(1, 1, 1); Display.TextScaled = true
 Instance.new("UICorner", Display)
 
--- [ 2. زر الـ OPEN (الأثر الدائم) ]
-local OpenBtn = Instance.new("TextButton", sg)
-OpenBtn.Size = UDim2.new(0, 90, 0, 45); OpenBtn.Position = UDim2.new(0, 10, 0.5, 0)
-OpenBtn.Text = "OPEN 🔓"; OpenBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0); OpenBtn.TextColor3 = Color3.new(1, 1, 1)
-OpenBtn.Visible = false; OpenBtn.TextScaled = true; Instance.new("UICorner", OpenBtn)
-
---- [[ المحرك الذهبي: قنص الأرقام الحقيقية ]] ---
-local function StartUltimateScanner()
-    Display.Text = "جاري قنص الرقم (تجاوز الفخاخ)..."
-    spawn(function()
-        while true do
-            local found = false
-            -- البحث في "كل" كائنات اللعبة عن أي قيمة رقمية تتغير
-            for _, v in pairs(game:GetDescendants()) do
-                if (v:IsA("IntValue") or v:IsA("StringValue") or v:IsA("TextLabel")) then
-                    local val = tonumber(v.Value or v.Text)
-                    -- الفلتر النهائي: حظر 4، 6، 999، 0 وأي رقم ثابت لا يتغير
-                    if val and val > 0 and val < 800 and val ~= 6 and val ~= 4 and val ~= 999 then
-                        Display.Text = "الرقم المضمون الآن:\n[" .. tostring(val) .. "]"
-                        Display.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
-                        found = true
-                    end
-                end
-            end
-            task.wait(0.4)
-        end
-    end)
+-- [ وظيفة الطيران الفائق (Tween TP) ]
+local function TeleportTo(targetPos)
+    local distance = (targetPos - root.Position).Magnitude
+    local info = TweenInfo.new(distance / 200, Enum.EasingStyle.Linear) -- سرعة 200 (خارقة)
+    local tween = TS:Create(root, info, {CFrame = CFrame.new(targetPos)})
+    tween:Play()
+    tween.Completed:Wait()
 end
 
---- [[ محرك الضغط الذكي: منع الأصفار (Human Jitter) ]] ---
-local clicking = false
-local function StartSmartClicker()
-    clicking = not clicking
-    if clicking then
-        Display.Text = "أوتو كليكر: نـشـط 🔥\n(جمع الـ Infinity بدون أصفار)"
-        Display.BackgroundColor3 = Color3.fromRGB(150, 100, 0)
+-- [[ محرك الدورة التلقائية: طيران -> أخذ -> ربح ]] --
+local hurricaneActive = false
+local function StartHurricane()
+    hurricaneActive = not hurricaneActive
+    if hurricaneActive then
+        Display.Text = "الإعصار نشط: جاري سحق الماب! ⚡"; Display.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
         spawn(function()
-            local r = Random.new()
-            while clicking do
-                -- إرسال ضغطة حقيقية متغيرة التوقيت لخداع الحماية
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 1)
-                task.wait(r:NextNumber(0.025, 0.045)) 
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 1)
-                task.wait(r:NextNumber(0.015, 0.035))
+            while hurricaneActive do
+                local targetFound = false
+                
+                -- 1. البحث عن الـ Infinity أو القطع النادرة
+                for _, item in pairs(game.Workspace:GetDescendants()) do
+                    if item:IsA("BasePart") and item.Transparency < 1 then
+                        if item.Name:lower():find("infinity") or item.Name:lower():find("point") then
+                            Display.Text = "تم رصد الهدف.. طيران! 🚀"
+                            TeleportTo(item.Position)
+                            firetouchinterest(root, item, 0) -- تأكيد الأخذ
+                            firetouchinterest(root, item, 1)
+                            targetFound = true
+                            task.wait(0.5) -- انتظار بسيط للتأكد من الأخذ
+                        end
+                    end
+                end
+                
+                -- 2. الطيران لمكان الأمان أو الربح (إذا لم يجد قطع)
+                if not targetFound then
+                    -- هنا نضع إحداثيات منطقة "الفوز" أو "الأمان" في الماب
+                    -- السكربت سيبحث عن أي منطقة تسمى "Safe" أو "Win"
+                    for _, zone in pairs(game.Workspace:GetDescendants()) do
+                        if zone.Name:lower():find("safe") or zone.Name:lower():find("win") then
+                            TeleportTo(zone.Position)
+                            Display.Text = "في منطقة الأمان.. تم الربح! ✅"
+                        end
+                    end
+                end
+                task.wait(0.2)
             end
         end)
     else
-        Display.Text = "تم إيقاف الضغط."
-        Display.BackgroundColor3 = Color3.fromRGB(0, 20, 40)
+        Display.Text = "تم إيقاف الإعصار."; Display.BackgroundColor3 = Color3.fromRGB(0, 40, 80)
     end
 end
 
--- [ أزرار التحكم بالواجهة ]
+-- أزرار التحكم
 local function AddBtn(txt, pos, func)
     local b = Instance.new("TextButton", Main)
-    b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, pos)
-    b.Text = txt; b.BackgroundColor3 = Color3.fromRGB(40, 40, 45); b.TextColor3 = Color3.new(1, 1, 1); b.TextScaled = true
+    b.Size = UDim2.new(0.9, 0, 0, 55); b.Position = UDim2.new(0.05, 0, 0, pos)
+    b.Text = txt; b.BackgroundColor3 = Color3.fromRGB(30, 30, 50); b.TextColor3 = Color3.new(1, 1, 1); b.TextScaled = true
     b.MouseButton1Click:Connect(func); Instance.new("UICorner", b)
 end
 
-AddBtn("كشف الرقم الحقيقي (100%) 👁️", 110, StartUltimateScanner)
-AddBtn("أوتو كليكر (بوب كورن + كوكيز) ⚡", 165, StartSmartClicker)
-AddBtn("إخفاء (تحويل لـ Open) 🛑", 220, function()
-    Main.Visible = false
-    OpenBtn.Visible = true
-end)
+AddBtn("تفعيل إعصار الربح التلقائي 🌀", 130, StartHurricane)
+AddBtn("إخفاء البانل (OPEN) 🛑", 200, function() Main.Visible = false; sg.OpenBtn.Visible = true end)
 
-OpenBtn.MouseButton1Click:Connect(function()
-    Main.Visible = true
-    OpenBtn.Visible = false
-end)
+local OpenBtn = Instance.new("TextButton", sg)
+OpenBtn.Name = "OpenBtn"; OpenBtn.Size = UDim2.new(0, 90, 0, 45); OpenBtn.Position = UDim2.new(0, 10, 0.5, 0); OpenBtn.Text = "OPEN 🔓"
+OpenBtn.Visible = false; OpenBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0); OpenBtn.TextColor3 = Color3.new(1, 1, 1); OpenBtn.TextScaled = true; Instance.new("UICorner", OpenBtn)
+OpenBtn.MouseButton1Click:Connect(function() Main.Visible = true; OpenBtn.Visible = false end)
