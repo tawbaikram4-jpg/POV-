@@ -1,57 +1,59 @@
--- [[ ♛ SATAYA VIP - HIDDEN PASSCODE SNIPER ♛ ]] --
+-- [[ ♛ SATAYA VIP - TRUE VALUE SNIPER ♛ ]] --
 local player = game.Players.LocalPlayer
 local pgui = player:WaitForChild("PlayerGui")
 
--- إعداد القائمة الملكية السرية
-if pgui:FindFirstChild("SatayaVault") then pgui.SatayaVault:Destroy() end
-local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaVault"; sg.ResetOnSpawn = false
+-- إعداد الواجهة (ScreenGui) بنفس شكل السكربت الأول
+if pgui:FindFirstChild("SatayaBypassV1") then pgui.SatayaBypassV1:Destroy() end
+local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaBypassV1"; sg.ResetOnSpawn = false
 
+-- [ 1. البانل الكبير ]
 local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 300, 0, 260); Main.Position = UDim2.new(0.5, -150, 0.4, 0)
-Main.BackgroundColor3 = Color3.fromRGB(10, 10, 10); Main.Active = true; Main.Draggable = true
+Main.Size = UDim2.new(0, 320, 0, 240); Main.Position = UDim2.new(0.5, -160, 0.4, 0)
+Main.BackgroundColor3 = Color3.fromRGB(10, 0, 0); Main.Active = true; Main.Draggable = true
 Instance.new("UICorner", Main)
 
-local Title = Instance.new("TextLabel", Main)
-Title.Text = "♛ SATAYA PRIVATE VAULT ♛"; Title.Size = UDim2.new(1, 0, 0, 40)
-Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Title.TextColor3 = Color3.new(1, 0.8, 0); Title.TextScaled = true
-
--- مربع عرض الباسورد (سيكون مخفياً في البداية)
 local Display = Instance.new("TextLabel", Main)
-Display.Text = "رقم العدو: [ **** ]"; Display.Position = UDim2.new(0, 0, 0, 45); Display.Size = UDim2.new(1, 0, 0, 70)
-Display.BackgroundColor3 = Color3.fromRGB(20, 20, 20); Display.TextColor3 = Color3.new(1, 1, 1); Display.TextScaled = true
+Display.Text = "تجاوز حماية 'جاري البحث'..."; Display.Size = UDim2.new(1, 0, 0, 100)
+Display.BackgroundColor3 = Color3.fromRGB(30, 0, 0); Display.TextColor3 = Color3.new(1, 1, 0); Display.TextScaled = true
+Instance.new("UICorner", Display)
 
-local RealNumber = "" -- المتغير الذي سيحفظ الرقم الحقيقي بعيداً عن الأعين
+-- [ 2. زر الـ OPEN (الأثر الدائم) ]
+local OpenBtn = Instance.new("TextButton", sg)
+OpenBtn.Size = UDim2.new(0, 80, 0, 40); OpenBtn.Position = UDim2.new(0, 5, 0.5, 0)
+OpenBtn.Text = "OPEN 🔓"; OpenBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 0); OpenBtn.TextColor3 = Color3.new(1, 1, 1)
+OpenBtn.Visible = false; OpenBtn.TextScaled = true; Instance.new("UICorner", OpenBtn)
 
--- [ محرك سحب رقم العدو وتخزينه سرياً ]
-local function StartSecretHack()
+-- [ محرك الاختراق: سحب الرقم الحقيقي من السيرفر ]
+local function GrabTrueNumber()
+    Display.Text = "جاري اختراق 'جاري البحث'..."
     spawn(function()
         while true do
-            local foundNumber = ""
-            for _, other in pairs(game.Players:GetPlayers()) do
-                if other ~= player and other.Character then
-                    -- فحص "الورقة" أو "القيم" المخفية
-                    local bb = other.Character:FindFirstChildWhichIsA("BillboardGui", true)
-                    if bb then
-                        local txt = bb:FindFirstChildWhichIsA("TextLabel", true)
-                        if txt and txt.Text ~= "" and tonumber(txt.Text) then
-                            foundNumber = txt.Text
-                            break
+            local foundVal = nil
+            -- البحث عن الرقم في "القيم المخفية" وليس في النصوص الظاهرة
+            for _, p in pairs(game.Players:GetPlayers()) do
+                if p ~= player then
+                    -- فحص مجلدات البيانات التي يرسلها السيرفر
+                    for _, v in pairs(p:GetDescendants()) do
+                        if (v:IsA("IntValue") or v:IsA("StringValue")) and tonumber(v.Value) and v.Value ~= 0 then
+                            -- استبعاد الأرقام الطويلة (مثل ID اللاعب) والتركيز على أرقام التخمين (1-100)
+                            local num = tonumber(v.Value)
+                            if num > 0 and num <= 1000 then
+                                foundVal = tostring(num)
+                                break
+                            end
                         end
                     end
                 end
             end
             
-            if foundNumber ~= "" then
-                RealNumber = foundNumber
-                if Display.Text:find("*") then
-                    Display.Text = "رقم العدو: [ تم الالتقاط ]"
-                    Display.BackgroundColor3 = Color3.fromRGB(0, 50, 0)
-                end
+            if foundVal then
+                Display.Text = "رقم العدو الحقيقي: [" .. foundVal .. "]"
+                Display.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+                Display.TextColor3 = Color3.new(1, 1, 1)
             else
-                Display.Text = "رقم العدو: [ يبحث... ]"
-                Display.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+                Display.Text = "في انتظار وضع العدو للرقم..."
             end
-            task.wait(0.5)
+            task.wait(0.1) -- فحص سريع جداً لمنع التعليق
         end
     end)
 end
@@ -59,26 +61,20 @@ end
 -- [ أزرار التحكم ]
 local function AddBtn(txt, pos, func)
     local b = Instance.new("TextButton", Main)
-    b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, pos)
+    b.Size = UDim2.new(0.9, 0, 0, 50); b.Position = UDim2.new(0.05, 0, 0, pos)
     b.Text = txt; b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.TextColor3 = Color3.new(1, 1, 1); b.TextScaled = true
     b.MouseButton1Click:Connect(func); Instance.new("UICorner", b)
 end
 
-AddBtn("تفعيل القناص السري 👁️", 120, StartSecretHack)
+AddBtn("تفعيل كاشف الأرقام الحقيقية 👁️", 110, GrabTrueNumber)
 
--- زر "إظهار / إخفاء" الباسورد
-AddBtn("إظهار الرقم الحقيقي 🔓", 170, function(btn)
-    if RealNumber ~= "" then
-        if Display.Text:find("*") or Display.Text:find("تم") then
-            Display.Text = "رقم العدو هو: [" .. RealNumber .. "]"
-            Display.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
-            btn.Text = "إخفاء الرقم 🔒"
-        else
-            Display.Text = "رقم العدو: [ **** ]"
-            Display.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-            btn.Text = "إظهار الرقم الحقيقي 🔓"
-        end
-    end
+-- زر الإغلاق (يترك أثر OPEN)
+AddBtn("إغلاق (تحويل لـ Open) 🛑", 165, function()
+    Main.Visible = false
+    OpenBtn.Visible = true
 end)
 
-AddBtn("إغلاق (X)", 220, function() sg:Destroy() end)
+OpenBtn.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    OpenBtn.Visible = false
+end)
