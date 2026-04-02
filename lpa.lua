@@ -1,20 +1,20 @@
--- [[ ♛ SATAYA VIP - THE FINAL JUSTICE HUB ♛ ]] --
+-- [[ ♛ SATAYA VIP - THE FINAL JUSTICE ♛ ]] --
 local player = game.Players.LocalPlayer
 local pgui = player:WaitForChild("PlayerGui")
 
--- إعداد الواجهة الملكية مع زر OPEN دائم
-if pgui:FindFirstChild("SatayaFinalHub") then pgui.SatayaFinalHub:Destroy() end
-local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaFinalHub"; sg.ResetOnSpawn = false
+-- تنظيف الشاشة من أي سكربت قديم
+if pgui:FindFirstChild("SatayaFinalFull") then pgui.SatayaFinalFull:Destroy() end
+local sg = Instance.new("ScreenGui", pgui); sg.Name = "SatayaFinalFull"; sg.ResetOnSpawn = false
 
--- [ 1. البانل الرئيسي - شكل الفخامة والتعويض ]
+-- [ 1. البانل الرئيسي ]
 local Main = Instance.new("Frame", sg)
-Main.Size = UDim2.new(0, 320, 0, 300); Main.Position = UDim2.new(0.5, -160, 0.4, 0)
+Main.Size = UDim2.new(0, 340, 0, 320); Main.Position = UDim2.new(0.5, -170, 0.4, 0)
 Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15); Main.Active = true; Main.Draggable = true
 Instance.new("UICorner", Main)
 
 local Display = Instance.new("TextLabel", Main)
-Display.Text = "المحرك جاهز للسيطرة..."; Display.Size = UDim2.new(1, 0, 0, 90)
-Display.BackgroundColor3 = Color3.fromRGB(40, 0, 0); Display.TextColor3 = Color3.new(1, 1, 1); Display.TextScaled = true
+Display.Text = "المحرك جاهز لخدمتك..."; Display.Size = UDim2.new(1, 0, 0, 90)
+Display.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Display.TextColor3 = Color3.new(1, 1, 1); Display.TextScaled = true
 Instance.new("UICorner", Display)
 
 -- [ 2. زر الـ OPEN (الأثر الدائم) ]
@@ -23,73 +23,69 @@ OpenBtn.Size = UDim2.new(0, 90, 0, 45); OpenBtn.Position = UDim2.new(0, 10, 0.5,
 OpenBtn.Text = "OPEN 🔓"; OpenBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0); OpenBtn.TextColor3 = Color3.new(1, 1, 1)
 OpenBtn.Visible = false; OpenBtn.TextScaled = true; Instance.new("UICorner", OpenBtn)
 
---- [[ محركات الاختراق الشاملة ]] ---
+--- [[ المحركات المدمجة ]] ---
 
--- أ. قناص الأرقام والكوكيز (تجاوز الفخاخ 999 و 6)
-local function StartUniversalScanner()
-    Display.Text = "جاري قنص الحلول الحية..."
+-- أ. محرك كشف الرقم (تجاهل الفخاخ والأرقام القديمة)
+local function StartNumberFinder()
+    Display.Text = "جاري قنص الرقم الحقيقي الجديد..."
     spawn(function()
         while true do
-            local found = false
-            -- فحص أرقام التخمين (تجاهل الفخاخ)
+            local foundVal = nil
             for _, p in pairs(game.Players:GetPlayers()) do
                 if p ~= player then
                     for _, v in pairs(p:GetDescendants()) do
-                        if (v:IsA("ValueBase") or v:IsA("TextLabel")) then
+                        if v:IsA("ValueBase") or v:IsA("TextLabel") then
                             local val = tonumber(v.Value or v.Text)
-                            if val and val > 0 and val < 900 and val ~= 6 then
-                                Display.Text = "الحل المكتشف: [" .. tostring(val) .. "]"
-                                Display.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
-                                found = true
+                            -- الفلتر الذهبي: يتجاهل 999، 6، 4، 0
+                            if val and val > 0 and val < 900 and val ~= 999 and val ~= 6 and val ~= 4 then
+                                foundVal = val
+                                break
                             end
                         end
                     end
                 end
             end
-            -- فحص الكوكيز (البحث عن القطعة الآمنة)
-            if not found then
-                for _, obj in pairs(game.Workspace:GetDescendants()) do
-                    if obj:IsA("BasePart") and (obj.Name:lower():find("safe") or obj.Name:lower():find("correct")) then
-                        Display.Text = "امشِ على: " .. obj.Name
-                        found = true
-                    end
-                end
+            
+            if foundVal then
+                Display.Text = "الرقم المكتشف الآن:\n[" .. tostring(foundVal) .. "]"
+                Display.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
             end
             task.wait(0.3)
         end
     end)
 end
 
--- ب. أوتو كليكر البوب كورن (الضغط الذهبي)
-local autoClick = false
+-- ب. محرك البوب كورن الذهبي (بدون أصفار)
+local clicking = false
 local function TogglePopcorn()
-    autoClick = not autoClick
-    if autoClick then
-        Display.Text = "أوتو كليكر بوب كورن: نـشـط 🔥"
+    clicking = not clicking
+    if clicking then
+        Display.Text = "أوتو كليكر: نـشـط 🔥\n(نقرات حقيقية لتعويض الـ Infinity)"
         Display.BackgroundColor3 = Color3.fromRGB(150, 100, 0)
         spawn(function()
-            while autoClick do
+            while clicking do
                 game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 1)
+                task.wait(0.02)
                 game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 1)
-                task.wait(0.01)
+                task.wait(0.02)
             end
         end)
     else
         Display.Text = "تم إيقاف الضغط."
-        Display.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+        Display.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     end
 end
 
--- [[ إنشاء الأزرار ]]
+-- [ أزرار التحكم ]
 local function AddBtn(txt, pos, func)
     local b = Instance.new("TextButton", Main)
     b.Size = UDim2.new(0.9, 0, 0, 45); b.Position = UDim2.new(0.05, 0, 0, pos)
-    b.Text = txt; b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.TextColor3 = Color3.new(1, 1, 1); b.TextScaled = true
+    b.Text = txt; b.BackgroundColor3 = Color3.fromRGB(45, 45, 45); b.TextColor3 = Color3.new(1, 1, 1); b.TextScaled = true
     b.MouseButton1Click:Connect(func); Instance.new("UICorner", b)
 end
 
-AddBtn("قنص (الأرقام + الكوكيز) 👁️", 100, StartUniversalScanner)
-AddBtn("أوتو كليكر بوب كورن ⚡", 155, TogglePopcorn)
+AddBtn("كشف الرقم الحقيقي (تجاهل الفخاخ) 👁️", 100, StartNumberFinder)
+AddBtn("أوتو كليكر بوب كورن (نقرات ذهبية) ⚡", 155, TogglePopcorn)
 AddBtn("إغلاق (أثر Open) 🛑", 210, function()
     Main.Visible = false
     OpenBtn.Visible = true
